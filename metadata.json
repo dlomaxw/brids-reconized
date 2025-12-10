@@ -1,0 +1,9 @@
+{
+  "name": "Rift Valley Birding Guide",
+  "description": "An intelligent birding companion for Uganda & Rwanda. Identify birds by sound and sight, explore hotspots, and connect with local guides.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
