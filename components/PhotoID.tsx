@@ -43,7 +43,7 @@ const PhotoID: React.FC<PhotoIDProps> = ({ onIdentify }) => {
       const base64Data = matches[2];
       
       const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash', // Reliable multimodal model
+        model: 'gemini-3-pro-preview', // Upgraded to Pro for better image analysis
         contents: {
           parts: [
             {

@@ -49,6 +49,17 @@ export interface BirdSpecies {
   iucnStatus: 'LC' | 'NT' | 'VU' | 'EN' | 'CR';
 }
 
+export interface LibraryBook {
+  id: string;
+  title: string;
+  authors: string;
+  year: string;
+  type: 'Field Guide' | 'Pocket Guide' | 'Regional Specialist';
+  description: string;
+  recommendedFor: string;
+  isbn?: string;
+}
+
 export enum AppView {
   HOME = 'HOME',
   LIVE_ID = 'LIVE_ID',
@@ -56,5 +67,7 @@ export enum AppView {
   HOTSPOTS = 'HOTSPOTS',
   NOTEBOOK = 'NOTEBOOK',
   GUIDES = 'GUIDES',
-  BIRD_GUIDE = 'BIRD_GUIDE'
+  BIRD_GUIDE = 'BIRD_GUIDE',
+  CHAT = 'CHAT',
+  LIBRARY = 'LIBRARY'
 }

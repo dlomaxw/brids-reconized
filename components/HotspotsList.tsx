@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, Mountain, Wind, Map as MapIcon, Loader2, X, Compass } from 'lucide-react';
+import { MapPin, Mountain, Wind, Map as MapIcon, Loader2, X, Compass, ExternalLink } from 'lucide-react';
 import { HOTSPOTS } from '../constants';
 import clsx from 'clsx';
 import { GoogleGenAI } from '@google/genai';
@@ -7,6 +7,7 @@ import { GoogleGenAI } from '@google/genai';
 const HotspotsList: React.FC = () => {
   const [selectedHotspot, setSelectedHotspot] = useState<string | null>(null);
   const [tripInfo, setTripInfo] = useState<string | null>(null);
+  const [groundingLinks, setGroundingLinks] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const apiKey = process.env.API_KEY || '';
 
@@ -14,6 +15,7 @@ const HotspotsList: React.FC = () => {
     if (!apiKey) return;
     setLoading(true);
     setTripInfo(null);
+    setGroundingLinks([]);
     setSelectedHotspot(hotspot.id);
 
     try {
@@ -36,6 +38,13 @@ const HotspotsList: React.FC = () => {
       });
       
       setTripInfo(response.text || "No information found.");
+      
+      // Extract Google Maps grounding chunks
+      const chunks = response.candidates?.[0]?.groundingMetadata?.groundingChunks;
+      if (chunks) {
+        setGroundingLinks(chunks);
+      }
+
     } catch (e) {
       console.error(e);
       setTripInfo("Could not connect to Maps data.");
@@ -47,6 +56,7 @@ const HotspotsList: React.FC = () => {
   const closeTripInfo = () => {
     setSelectedHotspot(null);
     setTripInfo(null);
+    setGroundingLinks([]);
   };
 
   return (
@@ -121,7 +131,7 @@ const HotspotsList: React.FC = () => {
       {/* Maps Grounding Info Modal */}
       {selectedHotspot && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl relative animate-in fade-in zoom-in duration-200">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-sm max-h-[80vh] overflow-y-auto shadow-2xl relative animate-in fade-in zoom-in duration-200">
             <button 
               onClick={closeTripInfo}
               className="absolute top-4 right-4 text-stone-400 hover:text-stone-600"
@@ -153,6 +163,29 @@ const HotspotsList: React.FC = () => {
                     )}
                  </div>
                  
+                 {groundingLinks.length > 0 && (
+                   <div className="bg-stone-50 p-3 rounded-xl border border-stone-100 space-y-2">
+                     <p className="text-xs font-semibold text-stone-500">Sources & Places:</p>
+                     {groundingLinks.map((chunk, i) => {
+                       const uri = chunk.web?.uri || chunk.maps?.uri;
+                       const title = chunk.web?.title || chunk.maps?.title || "View on Map";
+                       if (!uri) return null;
+                       return (
+                         <a 
+                           key={i} 
+                           href={uri} 
+                           target="_blank" 
+                           rel="noopener noreferrer"
+                           className="flex items-center gap-2 text-xs text-blue-600 hover:underline p-1 hover:bg-blue-50 rounded"
+                         >
+                           <ExternalLink className="w-3 h-3" />
+                           <span className="truncate">{title}</span>
+                         </a>
+                       );
+                     })}
+                   </div>
+                 )}
+
                  <div className="bg-blue-50 p-3 rounded-xl border border-blue-100">
                    <p className="text-[10px] text-blue-600 flex items-center gap-1">
                      <MapPin className="w-3 h-3" />
